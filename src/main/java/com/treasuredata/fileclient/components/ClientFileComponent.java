@@ -26,7 +26,7 @@ public class ClientFileComponent {
             System.out.println("Server: " + serverUrl);
             ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/connect", String.class);
             if (response.getStatusCode() == HttpStatus.ACCEPTED) {
-                this.clientId = response.getBody();
+                clientId = response.getBody();
                 return true;
             }
             return false;
@@ -60,7 +60,7 @@ public class ClientFileComponent {
      */
     public String sendAction(String command) {
         try {
-           ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/command/" + command, String.class);
+           ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/" + clientId + "/command/" + command, String.class);
            String body = response.getBody();
            if (body == null) {
                return BLANK;
