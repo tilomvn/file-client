@@ -1,6 +1,7 @@
 package com.treasuredata.fileclient.components;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,11 @@ public class ClientFileComponent {
     @Value("${server.url:http://localhost:4001/}")
     private String serverUrl;
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public ClientFileComponent(RestTemplateBuilder restTemplateBuilder) {
+        restTemplate = restTemplateBuilder.build();
+    }
 
     /**
      * Connect to server.
