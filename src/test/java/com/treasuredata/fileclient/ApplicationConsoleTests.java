@@ -23,14 +23,14 @@ public class ApplicationConsoleTests {
     ApplicationConsole applicationConsole;
 
     @Test
-    void testConnectionFailed() {
+    void testRunApplicationStoppedByConnectionFailed() {
         when(clientFileComponent.connect()).thenReturn(false);
         int retCode = applicationConsole.run(new String[] {});
-        assertEquals(0, retCode);
+        assertEquals(1, retCode);
     }
 
     @Test
-    void testApplication() {
+    void testRunApplication() {
         String responseList = "NghiaHo 2021-06-03 10:30 2021-06-03 15:22 readme.txt";
 
         when(clientFileComponent.connect()).thenReturn(true);
@@ -43,6 +43,6 @@ public class ApplicationConsoleTests {
                 "exit").getBytes()));
         int retCode = applicationConsole.run(new String[] {});
 
-        assertEquals(1, retCode);
+        assertEquals(0, retCode);
     }
 }

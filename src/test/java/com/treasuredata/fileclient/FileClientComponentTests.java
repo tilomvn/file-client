@@ -38,7 +38,6 @@ class FileClientComponentTests {
     @Test
     @Order(1)
     void testConnection() {
-        //Binding request procession
         serviceServer.expect(requestTo(serverUrl + "client/connect"))
                 .andRespond(withStatus(HttpStatus.ACCEPTED).body(uuid).contentType(MediaType.TEXT_PLAIN));
 
@@ -48,7 +47,7 @@ class FileClientComponentTests {
 
     @Test
     @Order(2)
-    void testSendCommand() {
+    void testSendCommandSuccess() {
         serviceServer.expect(requestTo(serverUrl + "client/" + uuid + "/command/index"))
                 .andRespond(withStatus(HttpStatus.OK).body(responseList).contentType(MediaType.TEXT_PLAIN));
 
@@ -70,7 +69,7 @@ class FileClientComponentTests {
 
     @Test
     @Order(4)
-    void testCloseConnection() {
+    void testCloseConnectionSuccess() {
         serviceServer.expect(requestTo(serverUrl + "client/disconnect/" + uuid))
                 .andRespond(withStatus(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN));
 

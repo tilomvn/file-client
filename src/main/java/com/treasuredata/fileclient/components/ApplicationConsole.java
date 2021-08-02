@@ -18,7 +18,7 @@ public class ApplicationConsole {
         System.out.println("Connecting to server...");
         if (!clientFileComponent.connect()) {
             System.out.println("Could not connect to server");
-            return 0;
+            return 1;
         }
         System.out.println("Connected");
         System.out.println("Command Description:");
@@ -39,6 +39,6 @@ public class ApplicationConsole {
         }
         System.out.println("Stopping client...");
         System.out.println("Stopped");
-        return 1;
+        return 0;
     }
 }

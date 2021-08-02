@@ -5,6 +5,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -35,6 +36,8 @@ public class ClientFileComponent {
                 return true;
             }
             return false;
+        } catch (HttpClientErrorException ex) {
+            return false;
         } catch (Exception ex) {
             return false;
         }
@@ -46,16 +49,12 @@ public class ClientFileComponent {
     public boolean closeConnect() {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/disconnect/" + clientId, String.class);
-            String body = response.getBody();
-            if (body != null) {
-                System.out.println(body);
-            }
+            System.out.println(response.getBody());
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             }
             return false;
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
             return false;
         }
     }
@@ -65,12 +64,14 @@ public class ClientFileComponent {
      */
     public String sendAction(String command) {
         try {
-           ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/" + clientId + "/command/" + command, String.class);
-           String body = response.getBody();
-           if (body == null) {
-               return BLANK;
-           }
-           return body;
+            ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/" + clientId + "/command/" + command, String.class);
+            String body = response.getBody();
+            if (body == null) {
+                return BLANK;
+            }
+            return body;
+        } catch (HttpClientErrorException ex) {
+            return ex.getResponseBodyAsString();
         } catch (Exception ex) {
             return ex.getMessage();
         }
