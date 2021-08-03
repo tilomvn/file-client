@@ -24,7 +24,7 @@ public class SocketFileClientComponentTests {
                 ServerSocket serverSocket = new ServerSocket( 4001);
                 while (true) {
                     Socket socket = serverSocket.accept();
-                    new ClientProcessor(socket).start();
+                    new ClientProcessorTest(socket).start();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -59,12 +59,12 @@ public class SocketFileClientComponentTests {
         assertEquals(null, response);
     }
 
-    static class ClientProcessor extends Thread {
+    static class ClientProcessorTest extends Thread {
         Socket socket;
         DataOutputStream out;
         DataInputStream in;
 
-        public ClientProcessor(Socket socket) {
+        public ClientProcessorTest(Socket socket) {
             this.socket = socket;
         }
 

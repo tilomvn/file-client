@@ -14,6 +14,10 @@ public class SocketClientFileComponent implements IClientFileComponent {
     String serverUrl;
     short port;
 
+    public SocketClientFileComponent(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
     public SocketClientFileComponent(String host, short port) {
         this.serverUrl = host;
         this.port = port;
@@ -23,7 +27,9 @@ public class SocketClientFileComponent implements IClientFileComponent {
     public boolean connect() {
         try {
             System.out.println("Socket Server: " + serverUrl);
-            clientSocket = new Socket(serverUrl, port);
+            if (clientSocket == null) {
+                clientSocket = new Socket(serverUrl, port);
+            }
             in = new DataInputStream(clientSocket.getInputStream());
             out = new DataOutputStream(clientSocket.getOutputStream());
             return true;
