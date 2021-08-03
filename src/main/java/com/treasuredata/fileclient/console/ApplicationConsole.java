@@ -1,15 +1,16 @@
-package com.treasuredata.fileclient.components;
+package com.treasuredata.fileclient.console;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.treasuredata.fileclient.components.IClientFileComponent;
 
 import java.util.Scanner;
 
-@Component
 public class ApplicationConsole {
 
-    @Autowired
-    ClientFileComponent clientFileComponent;
+    final IClientFileComponent clientFileComponent;
+
+    public ApplicationConsole(IClientFileComponent iClientFileComponent) {
+        this.clientFileComponent = iClientFileComponent;
+    }
 
     public int run(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -17,7 +18,7 @@ public class ApplicationConsole {
 
         System.out.println("Connecting to server...");
         if (!clientFileComponent.connect()) {
-            System.out.println("Could not connect to server");
+            System.out.println("Could not connect to server.");
             return 1;
         }
         System.out.println("Connected");
@@ -34,7 +35,7 @@ public class ApplicationConsole {
                 clientFileComponent.closeConnect();
                 break;
             } else {
-                System.out.println(clientFileComponent.sendAction(command));
+                clientFileComponent.sendAction(command);
             }
         }
         System.out.println("Stopping client...");

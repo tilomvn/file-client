@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
@@ -32,14 +33,14 @@ class FileClientComponentTests {
     @Autowired
     MockRestServiceServer serviceServer;
 
-    String uuid = UUID.randomUUID().toString();
+    String clientId = UUID.randomUUID().toString();
     String responseList = "NghiaHo 2021-06-03 10:30 2021-06-03 15:22 readme.txt";
 
     @Test
     @Order(1)
     void testConnection() {
         serviceServer.expect(requestTo(serverUrl + "client/connect"))
-                .andRespond(withStatus(HttpStatus.ACCEPTED).body(uuid).contentType(MediaType.TEXT_PLAIN));
+                .andRespond(withStatus(HttpStatus.ACCEPTED).body(clientId).contentType(MediaType.TEXT_PLAIN));
 
         boolean connection = clientFileComponent.connect();
         assertEquals(true, connection);
@@ -48,7 +49,7 @@ class FileClientComponentTests {
     @Test
     @Order(2)
     void testSendCommandSuccess() {
-        serviceServer.expect(requestTo(serverUrl + "client/" + uuid + "/command/index"))
+        serviceServer.expect(requestTo(serverUrl + "client/" + clientId + "/command/index"))
                 .andRespond(withStatus(HttpStatus.OK).body(responseList).contentType(MediaType.TEXT_PLAIN));
 
         String responseString = clientFileComponent.sendAction("index");
@@ -60,7 +61,7 @@ class FileClientComponentTests {
     void testSendCommandReturnUnknownCommand() {
         String command = "abc";
         String expectedResponse = "unknown command";
-        serviceServer.expect(requestTo(serverUrl + "client/" + uuid + "/command/" + command))
+        serviceServer.expect(requestTo(serverUrl + "client/" + clientId + "/command/" + command))
                 .andRespond(withStatus(HttpStatus.OK).body(expectedResponse).contentType(MediaType.TEXT_PLAIN));
 
         String responseString = clientFileComponent.sendAction(command);
@@ -70,7 +71,7 @@ class FileClientComponentTests {
     @Test
     @Order(4)
     void testCloseConnectionSuccess() {
-        serviceServer.expect(requestTo(serverUrl + "client/disconnect/" + uuid))
+        serviceServer.expect(requestTo(serverUrl + "client/disconnect/" + clientId))
                 .andRespond(withStatus(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN));
 
         boolean connection = clientFileComponent.closeConnect();
@@ -80,10 +81,30 @@ class FileClientComponentTests {
     @Test
     @Order(5)
     void testCloseConnectionFailed() {
-        serviceServer.expect(requestTo(serverUrl + "client/disconnect/" + uuid))
+        serviceServer.expect(requestTo(serverUrl + "client/disconnect/" + clientId))
                 .andRespond(withServerError());
 
         boolean connection = clientFileComponent.closeConnect();
+        assertEquals(false, connection);
+    }
+
+    @Test
+    @Order(6)
+    void testConnectionFailedByInternalServerError() {
+        serviceServer.expect(requestTo(serverUrl + "client/connect"))
+                .andRespond(withServerError());
+
+        boolean connection = clientFileComponent.connect();
+        assertEquals(false, connection);
+    }
+
+    @Test
+    @Order(7)
+    void testConnectionFailedByOthers() {
+        serviceServer.expect(requestTo(serverUrl + "client/connect"))
+                .andRespond(withNoContent());
+
+        boolean connection = clientFileComponent.connect();
         assertEquals(false, connection);
     }
 }

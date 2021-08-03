@@ -9,13 +9,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class ClientFileComponent {
+public class ClientFileComponent implements IClientFileComponent {
 
     private static final String BLANK = "";
 
     private String clientId;
 
-    @Value("${server.url:http://localhost:4001/}")
+    @Value("${service.server.url:http://localhost:4001/}")
     private String serverUrl;
 
     private final RestTemplate restTemplate;
@@ -27,6 +27,7 @@ public class ClientFileComponent {
     /**
      * Connect to server.
      */
+    @Override
     public boolean connect() {
         try {
             System.out.println("Server: " + serverUrl);
@@ -37,8 +38,10 @@ public class ClientFileComponent {
             }
             return false;
         } catch (HttpClientErrorException ex) {
+            System.out.println(ex.getResponseBodyAsString());
             return false;
         } catch (Exception ex) {
+            ex.printStackTrace();
             return false;
         }
     }
@@ -46,6 +49,7 @@ public class ClientFileComponent {
     /**
      * Close connection.
      */
+    @Override
     public boolean closeConnect() {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/disconnect/" + clientId, String.class);
@@ -53,6 +57,9 @@ public class ClientFileComponent {
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             }
+            return false;
+        } catch (HttpClientErrorException ex) {
+            System.out.println(ex.getResponseBodyAsString());
             return false;
         } catch (Exception ex) {
             return false;
@@ -62,6 +69,7 @@ public class ClientFileComponent {
     /**
      * Send command to server.
      */
+    @Override
     public String sendAction(String command) {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(serverUrl + "client/" + clientId + "/command/" + command, String.class);
@@ -69,11 +77,14 @@ public class ClientFileComponent {
             if (body == null) {
                 return BLANK;
             }
+            System.out.println(body);
             return body;
         } catch (HttpClientErrorException ex) {
+            System.out.println(ex.getResponseBodyAsString());
             return ex.getResponseBodyAsString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            ex.printStackTrace();
+            return null;
         }
     }
 }
